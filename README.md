@@ -77,3 +77,13 @@ The exact first-order result is also a model-verification benchmark. As N become
 - Dimensionless criterion maps for multiple kinetic orders.
 - Explicit error definition for desired intermediate product yield and full composition vectors.
 - Optional nonisothermal rate constants and experimental RTD coupling.
+
+
+### v0.2.1 numerical correction
+
+The PFR intermediate-product expression evaluates the exponential difference using
+`expm1` and factors out `exp(-min(Da1, Da2))`, avoiding overflow/underflow
+for strongly separated nonnegative Damköhler numbers. Regression tests include
+Da values up to 1000 and independent ODE integration for moderate values.
+The power-law stage count remains an exhaustive bounded scan; acceleration
+by binary search requires a monotonicity justification.

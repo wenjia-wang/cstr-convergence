@@ -96,3 +96,30 @@ def test_nearly_equal_rate_constants():
         p = series_pfr(d1, d1+delta)
         assert p[1] == pytest.approx(d1*np.exp(-d1), rel=2e-9)
         assert sum(p) == pytest.approx(1.)
+
+
+def test_series_pfr_extreme_rate_separation():
+    # Closed-form reference: with very fast A consumption, B tends to exp(-Da2).
+    for d1, d2 in ((800., 1.), (1000., 0.5)):
+        values = series_pfr(d1, d2)
+        assert np.all(np.isfinite(values))
+        assert values[1] == pytest.approx(
+            d1 * np.exp(-d2) / (d1-d2), rel=1e-12)
+        assert np.sum(values) == pytest.approx(1.)
+    for d1, d2 in ((0.5, 1000.), (1., 800.)):
+        values = series_pfr(d1, d2)
+        assert np.all(np.isfinite(values))
+        assert values[1] == pytest.approx(
+            d1 * np.exp(-d1) / (d2-d1), rel=1e-12)
+        assert np.sum(values) == pytest.approx(1.)
+
+
+def test_series_pfr_against_independent_ode():
+    from scipy.integrate import solve_ivp
+    for d1, d2 in ((2., 0.5), (0.5, 2.), (2., 2.), (6., 0.4)):
+        def rhs(_, y):
+            a, b, c = y
+            return [-d1*a, d1*a-d2*b, d2*b]
+        ref = solve_ivp(rhs, (0, 1), [1, 0, 0], method='DOP853',
+                        rtol=1e-12, atol=1e-13).y[:, -1]
+        assert series_pfr(d1, d2) == pytest.approx(ref, abs=2e-12)

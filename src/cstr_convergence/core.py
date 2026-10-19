@@ -51,9 +51,9 @@ def series_pfr(da1: float, da2: float) -> np.ndarray:
     _positive(da1, 'Da1', allow_zero=True)
     _positive(da2, 'Da2', allow_zero=True)
     a = np.exp(-da1)
-    delta = da2-da1
-    ratio = -np.expm1(-delta)/delta if delta != 0 else 1.0
-    b = da1*a*ratio
+    gap = abs(da2 - da1)
+    ratio = -np.expm1(-gap) / gap if gap != 0 else 1.0
+    b = da1 * np.exp(-min(da1, da2)) * ratio
     return np.array([a, b, 1.0-a-b], dtype=float)
 
 
@@ -113,7 +113,6 @@ def minimum_stages_scan(error_fn, tolerance: float, max_stages: int = 1000,
     _stages(max_stages)
     if criterion not in ('first', 'persistent'):
         raise ValueError("criterion must be 'first' or 'persistent'")
-    first = None
     last_failure = 0
     for n in range(1, max_stages+1):
         v = float(error_fn(n))
@@ -122,8 +121,6 @@ def minimum_stages_scan(error_fn, tolerance: float, max_stages: int = 1000,
         if v <= tolerance:
             if criterion == 'first':
                 return n
-            if first is None:
-                first = n
         else:
             last_failure = n
     if criterion == 'first':
