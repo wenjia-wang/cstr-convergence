@@ -149,7 +149,7 @@ def series_minimum_stages(da1: float, da2: float, tolerance: float,
     if metric not in ('B', 'vector'):
         raise ValueError("metric must be 'B' or 'vector'")
     def error(n):
-        difference = np.abs(series_cstr(da1, da2, n)-target)
+        difference = np.abs(series_cstr_exact(da1, da2, n)-target)
         return difference[1] if metric == 'B' else np.max(difference)
     return minimum_stages_scan(error, tolerance, max_stages, criterion)
 
@@ -159,6 +159,80 @@ def first_order_minimum_stages(da: float, tolerance: float,
     target = first_order_pfr(da)
     return minimum_stages(lambda n: abs(first_order_cstr(da, n)-target), tolerance, max_stages)
 
+
+
+def series_cstr_exact(da1: float, da2: float, n: int) -> np.ndarray:
+    """Closed-form N-CSTR A->B->C, stable for equal and disparate rates."""
+    _positive(da1, 'Da1', allow_zero=True)
+    _positive(da2, 'Da2', allow_zero=True)
+    _stages(n)
+    lo, gap = min(da1, da2), abs(da2-da1)
+    a = float(np.exp(-n*np.log1p(da1/n)))
+    if gap == 0:
+        b = float(da1*np.exp(-(n+1)*np.log1p(da1/n)))
+    else:
+        w = n*np.log1p(gap/(n+lo))
+        b = float(da1*np.exp(-n*np.log1p(lo/n))*(-np.expm1(-w))/gap)
+    return np.array([a, b, 1.0-a-b], dtype=float)
+
+
+def logarithmic_mean(a: float, b: float) -> float:
+    """Positive logarithmic mean with stable near-equal limit."""
+    _positive(a, 'a')
+    _positive(b, 'b')
+    lo, hi = min(a,b), max(a,b)
+    q = (hi-lo)/lo
+    return float(lo * q / np.log1p(q)) if q != 0 else float(lo)
+
+
+def series_asymptotic_error(da1: float, da2: float) -> np.ndarray:
+    """Leading coefficient K in y_N-y_PFR = K/N + O(N^-2)."""
+    _positive(da1, 'Da1', allow_zero=True)
+    _positive(da2, 'Da2', allow_zero=True)
+    p = series_pfr(da1, da2)
+    # y''(1) = M^2 y(1); the dimensionless rate matrix M is constant.
+    a, b, _ = p
+    k_a = 0.5 * da1**2 * a
+    dA = -da1*a
+    dB = da1*a-da2*b
+    ddB = da1*dA-da2*dB
+    k_b = 0.5*ddB
+    return np.array([k_a, k_b, -k_a-k_b], dtype=float)
+
+
+def power_law_asymptotic_coefficient(da: float, order: float) -> float:
+    """K in X_PFR-X_N = K/N + O(N^-2), for positive PFR exit c.
+
+    Returns nan at finite-time depletion for 0<order<1, since
+    standard smooth asymptotics do not apply there.
+    """
+    _positive(da, 'Da', allow_zero=True)
+    _positive(order, 'order', allow_zero=True)
+    if order == 0 or da == 0:
+        return 0.0
+    c = 1.0-nth_order_pfr(da, order)
+    if c <= 0:
+        return float('nan')
+    return float(0.5*order*da*c**order*(-np.log(c)))
+
+
+def first_order_asymptotic_diagnostic(da: float, tolerance: float) -> dict:
+    """Leading estimate and second/first term ratio (NOT a certified bound)."""
+    _positive(da, 'Da', allow_zero=True)
+    _positive(tolerance, 'tolerance')
+    k = 0.5*da*da*np.exp(-da)
+    estimated_n = k/tolerance
+    ratio = abs((da*da/4-2*da/3)/estimated_n) if estimated_n>0 else float('nan')
+    return dict(estimated_stages=float(estimated_n), second_to_first=float(ratio),
+                validated=False)
+
+
+def series_asymptotic_sign(da1: float, da2: float) -> int:
+    """Sign of large-N B_N-B_PFR; 0 denotes zero leading coefficient."""
+    _positive(da1, 'Da1')
+    _positive(da2, 'Da2')
+    mean = logarithmic_mean(da1, da2)
+    return 1 if mean>2 else (-1 if mean<2 else 0)
 
 def _positive(x, label, allow_zero=False):
     if not np.isfinite(x) or (x < 0 if allow_zero else x <= 0):

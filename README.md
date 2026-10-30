@@ -87,3 +87,19 @@ for strongly separated nonnegative Damköhler numbers. Regression tests include
 Da values up to 1000 and independent ODE integration for moderate values.
 The power-law stage count remains an exhaustive bounded scan; acceleration
 by binary search requires a monotonicity justification.
+
+
+## Version 0.3.0: asymptotic analysis and exact series evaluation
+
+- `series_cstr_exact(da1, da2, n)` evaluates the closed-form A->B->C cascade independently of the recursive solver.
+- `logarithmic_mean(da1, da2)` and `series_asymptotic_sign` classify the **large-N** B-yield error using L(da1,da2) compared with 2. This is **not** a finite-N monotonicity theorem.
+- `series_asymptotic_error` gives the leading **vector** coefficient of `(y_N-y_PFR)`, evaluated at dimensionless outlet time 1.
+- `power_law_asymptotic_coefficient` returns the first term of `X_PFR-X_N` where the PFR exit concentration is positive; returns NaN for finite-time depletion.
+- `first_order_asymptotic_diagnostic` reports an estimate and relative second-order correction. The estimate is **not** an exact minimum stage count nor a validated error bound; use `first_order_minimum_stages` for the actual design choice.
+- The `persistent` criterion in `series_minimum_stages` remains certified only over the enumerated finite range 1..max_stages.
+
+Run `python examples/convergence_v03.py` after installing the optional plot dependencies to reproduce B-yield error crossing zero.
+
+## Research connection
+
+This repository provides reproducible isothermal staging examples relevant to dimensionless finite-stage performance analysis. It does not yet implement the manuscript-specific generalized coefficient Phi, composition-dependent kinetics, uncertainty propagation, or decision-regret optimization. These remain separate proposed extensions.
