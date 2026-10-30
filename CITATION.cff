@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the associated research paper."
+title: "CSTR Convergence: Kinetic Criteria for Reactor Staging"
+authors:
+  - family-names: Wang
+    given-names: Wenjia
+version: 0.4.2
+type: software
+license: MIT
+keywords:
+  - chemical reaction engineering
+  - reactor staging
+  - kinetic sensitivity
+  - process design
+references:
+  - type: article
+    title: "Kinetic Criteria for Finite CSTR Staging toward Plug-Flow Performance"
+    authors:
+      - family-names: Wang
+        given-names: Wenjia
+    doi: "10.26434/chemrxiv.15007934/v1"
+    year: 2026

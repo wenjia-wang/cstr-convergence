@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2
+- Add machine-readable software citation metadata with a ChemRxiv paper reference.
+- Add a deterministic kinetic-uncertainty and integer-stage-boundary demonstration.
+- Add independent regression tests for both uncertainty regimes.
+
 ## 0.4.1
 - Reorganize the README around the research result, Φ reproduction, and decision sensitivity.
 - Clarify the connection to the ChemRxiv paper and its reference concentration sweep.

@@ -41,9 +41,23 @@ The continuous sensitivity of Φ does not translate into a stage-count change in
 
 ```bash
 python examples/decision_sensitivity.py
+python examples/stage_uncertainty.py
 ```
 
 This example provides a computational basis for examining which kinetic uncertainties are consequential to a reactor design decision. The 0.0769 M point appears in the manuscript Supporting Information concentration sweep (Table S10).
+
+## A second decision example: uncertainty in the kinetic rate
+
+For a first-order reaction at fixed residence time, uncertainty in the rate constant translates directly into uncertainty in `Da = k * tau`. At an **absolute conversion tolerance of 0.01**, the repository includes a deterministic parameter-sweep example:
+
+- **Da = 2.0 ± 10%:** all 201 sampled values require **27 stages**.
+- **Da = 2.39 ± 1%:** the smallest required integer stage count changes between **27 and 26**.
+
+Thus a larger rate-constant range may preserve the decision, while a smaller range near a stage boundary changes it. The example is a controlled sensitivity sweep, not a statistical posterior or calibrated uncertainty distribution.
+
+```bash
+python examples/stage_uncertainty.py
+```
 
 ## Install and reproduce
 
@@ -84,4 +98,4 @@ Models assume steady isothermal operation, constant volumetric flow, and equal-v
 - Connect reactor-performance objectives to downstream separation recovery and process economics.
 - Integrate nonisothermal reaction histories and experimentally characterized residence-time distributions.
 
-See [CHANGELOG.md](CHANGELOG.md) for version history and [LICENSE](LICENSE) for the MIT license.
+See [CITATION.cff](CITATION.cff) for software citation metadata and [CHANGELOG.md](CHANGELOG.md) for version history and [LICENSE](LICENSE) for the MIT license.
