@@ -1,112 +1,87 @@
-# cstr-convergence
+# CSTR Convergence
 
-A compact, reproducible chemical reaction engineering tool for quantifying how a series of equal-volume continuous stirred-tank reactors approaches ideal plug-flow behavior at the same total residence time.
+**Objective-specific kinetic criteria for finite reactor staging and process-design decisions.**
 
-## Models
+This Python package connects reaction-network kinetics to the number of equal-volume continuous stirred-tank reactors (CSTRs) needed to retain a specified fraction of plug-flow reactor (PFR) performance. It implements the finite-staging coefficient **Φ**, reproduces nonlinear xylose-dehydration results from a research manuscript, and illustrates when kinetic changes alter a discrete reactor-design choice.
 
-- Single irreversible reaction with power-law kinetics: `-r_A = k C_A^n` (order n >= 0).
-- First-order A -> B -> C network, with individual rate constants.
-- The first-order reaction has an exact CSTR formula and an exact PFR reference.
-- Calculates the minimum integer stage count for a given **absolute conversion error** for first-order and power-law reactions, and finite-range stage scans for series-reaction intermediate yields.
+**Research reference:** W. Wang, [*Kinetic Criteria for Finite CSTR Staging toward Plug-Flow Performance*](https://doi.org/10.26434/chemrxiv.15007934/v1), ChemRxiv (2026).
 
-For the first-order case, at `Da = k * tau`:
+## Main result: concentration-dependent staging sensitivity
 
-`X_PFR = 1 - exp(-Da)`
+![Optimized finite-staging coefficient Phi versus inlet xylose concentration](results/xylose_phi.png)
 
-`X_N = 1 - (1 + Da/N)^(-N)`
+At the published kinetic condition (160 °C, model hydronium concentration 0.10 M), the four-pathway xylose network gives an **interior maximum** in the optimized, objective-normalized coefficient Φ.
 
-`error = abs(X_N - X_PFR)`
+| Inlet xylose (M) | Φ |
+| ---: | ---: |
+| 0.033 | 0.4889 |
+| 0.176 | **0.5967** |
+| 0.340 | 0.5554 |
 
-`N_min = min {N >= 1 : error <= tolerance}`
+Φ connects reaction-network structure and the chosen performance objective to the leading fractional loss from finite staging:
 
-## Installation
+\[
+\frac{J_{\mathrm{PFR}}^*-J_N^*}{J_{\mathrm{PFR}}^*}
+=\frac{\Phi}{N}+O(N^{-2}).
+\]
+
+Here each architecture independently optimizes total residence time for the target furfural yield. The exact integer stage requirement is obtained by optimizing the finite-CSTR cascade, rather than rounding the leading asymptotic estimate.
+
+## Decision example: kinetic sensitivity versus stage-count sensitivity
+
+At **0.0769 M inlet xylose**, vary the cross-degradation coefficient for `I + F -> degradation` by ±30%, keeping all other model coefficients fixed:
+
+| Cross-degradation coefficient | Φ | Minimum stages for 95% optimized PFR yield |
+| --- | ---: | ---: |
+| 0.70 × baseline | 0.5287 | **10** |
+| 1.00 × baseline | 0.5577 | **11** |
+| 1.30 × baseline | 0.5764 | **11** |
+
+The continuous sensitivity of Φ does not translate into a stage-count change in both directions. This is a **controlled kinetic-perturbation demonstration**; the ±30% range is chosen for illustration.
+
+```bash
+python examples/decision_sensitivity.py
+```
+
+This example provides a computational basis for examining which kinetic uncertainties are consequential to a reactor design decision. The 0.0769 M point appears in the manuscript Supporting Information concentration sweep (Table S10).
+
+## Install and reproduce
 
 ```bash
 python -m pip install -e ".[dev,plot]"
+python -m pytest -q
+python examples/paper_reproduction.py
+python examples/decision_sensitivity.py
 ```
 
-## Example
+`paper_reproduction.py` writes `results/xylose_phi.csv` and `results/xylose_phi.png`. Detailed model equations, kinetic parameters, and verification targets are in [PAPER_REPRODUCTION.md](PAPER_REPRODUCTION.md).
 
-```python
-from cstr_convergence import first_order_minimum_stages, series_cstr
+## Available models and numerical methods
 
-print(first_order_minimum_stages(da=2.0, tolerance=0.01))
-print(series_cstr(da1=2.0, da2=1.0, n=10))
-```
+- **Nonlinear xylose dehydration:** `X -> I -> F`, first-order furfural degradation, and bimolecular `I + F` degradation; PFR, finite CSTR, optimized furfural yield, Φ, and local kinetic sensitivity.
+- **Consecutive first-order reactions:** `A -> B -> C`, including analytical PFR and finite-CSTR benchmarks, optimized yield, asymptotic coefficients, and exact stage-count calculations.
+- **Single power-law reaction:** PFR and finite-CSTR conversion for order `n >= 0`, including zero-order depletion.
+- **Error and stage-count criteria:** absolute conversion error; intermediate-yield and composition errors; first-passing and bounded persistent stage scans.
 
-Run a graphical example:
+The mathematical connection is the backward-Euler equivalence of an equal-CSTR cascade and the PFR reaction ODE. The reaction network and performance objective determine the finite-stage error coefficient; equal-CSTR hydrodynamics supply the `1/N` scale.
 
-```bash
-python examples/demo.py
-```
-
-It creates `outputs/convergence.png`.
-
-## Verification
+## Validation
 
 ```bash
 python -m pytest -q
 ```
 
-Tests check the exact first-order solution, PFR convergence, conservation for A -> B -> C, and minimum-stage search.
+Tests cover analytical first-order solutions, zero- and fractional-order kinetics, CSTR mass balances, exact versus recursive consecutive-reaction solutions, extreme Damköhler-number numerical stability, independent PFR ODE comparisons, Φ values from manuscript Supporting Information Tables S10–S11, optimized consecutive-reaction benchmarks, and the discrete decision example. GitHub Actions runs the test suite on pushes and pull requests.
 
-## Assumptions and scope
+## Scope
 
-1. Constant fluid density and volumetric flow; steady state; isothermal reactors.
-2. Identical perfectly mixed tanks with equal residence time `tau/N`. Total residence time is held fixed as N varies.
-3. Power-law reaction with concentration normalized by its inlet value: `Da = k C_A0^(n-1) tau`. For a zero-order model, complete depletion is treated as a physical concentration floor.
-4. For A -> B -> C, both steps are first order and dimensionless `Da1 = k1*tau`, `Da2 = k2*tau`.
-5. `minimum_stages` uses binary search and requires a nonincreasing error. Do not use it for intermediate-species yield errors. `minimum_stages_scan` exhaustively evaluates integer stages up to `max_stages` and provides `first` or `persistent` criteria. The latter guarantees the criterion **within the inspected finite range only**, not for all larger N.
-6. These functions demonstrate established reactor design relationships. No new mathematical convergence theorem is claimed.
+Models assume steady isothermal operation, constant volumetric flow, and equal-volume ideal CSTR stages at fixed total residence time for each comparison. `minimum_stages_scan(..., criterion="persistent")` checks persistence through the supplied `max_stages`; its finite search interval is specified in the function documentation. Asymptotic coefficients describe the large-`N` limit and are complemented by explicit finite-stage calculations.
 
-## Additional stage-count functions
+## Further development
 
-```python
-from cstr_convergence import nth_order_minimum_stages, series_minimum_stages
-print(nth_order_minimum_stages(da=2, order=2, tolerance=.01))
-print(series_minimum_stages(da1=6, da2=.4, tolerance=5e-5,
-                            max_stages=200, criterion="persistent", metric="B"))
-```
+- Extend the objective-specific Φ interface to additional nonlinear chemical reaction networks.
+- Propagate kinetic and chemical-state uncertainty into stage-selection boundaries.
+- Connect reactor-performance objectives to downstream separation recovery and process economics.
+- Integrate nonisothermal reaction histories and experimentally characterized residence-time distributions.
 
-For intermediate yields, `criterion="first"` returns the first passing integer stage. `criterion="persistent"` returns the earliest stage at which all remaining **checked** stages through the inclusive `max_stages` pass. No claim is made for stages beyond this cap. `metric="vector"` uses the largest absolute error among A, B and C. These finite-range searches may be computationally expensive.
-
-The exact first-order result is also a model-verification benchmark. As N becomes large, the leading absolute conversion error is Da² exp(-Da)/(2N); this is an asymptotic approximation and should not be used as an exact stage-count criterion.
-
-## Roadmap
-
-- Dimensionless criterion maps for multiple kinetic orders.
-- Explicit error definition for desired intermediate product yield and full composition vectors.
-- Optional nonisothermal rate constants and experimental RTD coupling.
-
-
-### v0.2.1 numerical correction
-
-The PFR intermediate-product expression evaluates the exponential difference using
-`expm1` and factors out `exp(-min(Da1, Da2))`, avoiding overflow/underflow
-for strongly separated nonnegative Damköhler numbers. Regression tests include
-Da values up to 1000 and independent ODE integration for moderate values.
-The power-law stage count remains an exhaustive bounded scan; acceleration
-by binary search requires a monotonicity justification.
-
-
-## Version 0.3.0: asymptotic analysis and exact series evaluation
-
-- `series_cstr_exact(da1, da2, n)` evaluates the closed-form A->B->C cascade independently of the recursive solver.
-- `logarithmic_mean(da1, da2)` and `series_asymptotic_sign` classify the **large-N** B-yield error using L(da1,da2) compared with 2. This is **not** a finite-N monotonicity theorem.
-- `series_asymptotic_error` gives the leading **vector** coefficient of `(y_N-y_PFR)`, evaluated at dimensionless outlet time 1.
-- `power_law_asymptotic_coefficient` returns the first term of `X_PFR-X_N` where the PFR exit concentration is positive; returns NaN for finite-time depletion.
-- `first_order_asymptotic_diagnostic` reports an estimate and relative second-order correction. The estimate is **not** an exact minimum stage count nor a validated error bound; use `first_order_minimum_stages` for the actual design choice.
-- The `persistent` criterion in `series_minimum_stages` remains certified only over the enumerated finite range 1..max_stages.
-
-Run `python examples/convergence_v03.py` after installing the optional plot dependencies to reproduce B-yield error crossing zero.
-
-## Research connection
-
-This repository provides reproducible isothermal staging examples relevant to dimensionless finite-stage performance analysis. It does not yet implement the manuscript-specific generalized coefficient Phi, composition-dependent kinetics, uncertainty propagation, or decision-regret optimization. These remain separate proposed extensions.
-
-
-## Paper reproduction (v0.4)
-
-The module `cstr_convergence.xylose` implements the published four-rate xylose network and the optimized objective-normalized staging coefficient Φ; `cstr_convergence.paper` provides optimized first-order consecutive-reaction benchmarks. See [PAPER_REPRODUCTION.md](PAPER_REPRODUCTION.md) for the exact model, assumptions, provenance, and verification values.
-
-Run `python examples/paper_reproduction.py` for the concentration-dependent Φ result and `python examples/decision_sensitivity.py` for a demonstration of sensitivity of the **integer** stage requirement to a kinetic parameter. The latter is an exploratory calculation, not a claim of measured parameter uncertainty.
+See [CHANGELOG.md](CHANGELOG.md) for version history and [LICENSE](LICENSE) for the MIT license.

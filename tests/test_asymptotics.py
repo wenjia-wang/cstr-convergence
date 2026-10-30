@@ -7,7 +7,7 @@ from cstr_convergence import (
 )
 
 def test_version():
-    assert __version__ == '0.4.0'
+    assert __version__ == '0.4.1'
 
 def test_closed_form_matches_independent_recursion():
     for a,b in [(0.5,3),(2,1),(6,0.4),(800,1),(1,800),(2,2),(0,2),(2,0)]:
