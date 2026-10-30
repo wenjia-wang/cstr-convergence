@@ -103,3 +103,10 @@ Run `python examples/convergence_v03.py` after installing the optional plot depe
 ## Research connection
 
 This repository provides reproducible isothermal staging examples relevant to dimensionless finite-stage performance analysis. It does not yet implement the manuscript-specific generalized coefficient Phi, composition-dependent kinetics, uncertainty propagation, or decision-regret optimization. These remain separate proposed extensions.
+
+
+## Paper reproduction (v0.4)
+
+The module `cstr_convergence.xylose` implements the published four-rate xylose network and the optimized objective-normalized staging coefficient Φ; `cstr_convergence.paper` provides optimized first-order consecutive-reaction benchmarks. See [PAPER_REPRODUCTION.md](PAPER_REPRODUCTION.md) for the exact model, assumptions, provenance, and verification values.
+
+Run `python examples/paper_reproduction.py` for the concentration-dependent Φ result and `python examples/decision_sensitivity.py` for a demonstration of sensitivity of the **integer** stage requirement to a kinetic parameter. The latter is an exploratory calculation, not a claim of measured parameter uncertainty.
