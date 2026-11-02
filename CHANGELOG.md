@@ -1,36 +1,30 @@
 # Changelog
 
-## v0.4.2a (package 0.4.2.post1; V14)
-- Preserve the verified v0.4.2 computations.
-- Add optimized V14 baseline table, explicit manuscript mapping, and automated numerical regression checks.
-
+## 0.5.0
+- Calculate first- and second-order optimized finite-stage coefficients directly from kinetic equations.
+- Include residence-time optimization in the second-order performance correction.
+- Locate exact stage-feasibility boundaries in feed concentration and kinetic-parameter space.
+- Compare asymptotic stage estimates with exact finite-CSTR optimization.
+- Provide project-oriented numerical examples, plots, and regression tests.
 
 ## 0.4.2
-- Add machine-readable software citation metadata with a ChemRxiv paper reference.
-- Add a deterministic kinetic-uncertainty and integer-stage-boundary demonstration.
-- Add independent regression tests for both uncertainty regimes.
+- Add machine-readable citation metadata, integer stage-selection sensitivity examples and tests.
 
 ## 0.4.1
-- Reorganize the README around the research result, Φ reproduction, and decision sensitivity.
-- Clarify the connection to the ChemRxiv paper and its reference concentration sweep.
-- Improve readability of the decision-sensitivity example and align package metadata.
+- Add reproducible parameter and decision-sensitivity examples and organize documentation.
 
 ## 0.4.0
-- Implement the four-pathway nonlinear xylose network and optimized staging coefficient Φ.
-- Reproduce the concentration-dependent interior maximum and add stage-decision sensitivity.
-- Add paper reproduction instructions, regression tests, and benchmark calculations.
+- Implement nonlinear xylose kinetics and objective-normalized coefficient Phi.
+- Add reference numerical benchmarks and regression tests.
 
 ## 0.3.0
-- Add exact consecutive-reaction cascade solutions and asymptotic convergence analysis.
-- Add logarithmic-mean classification and a convergence example.
+- Add exact consecutive-reaction solutions and asymptotic error calculations.
 
 ## 0.2.1
-- Stabilize the consecutive PFR expression for widely separated Damköhler numbers.
-- Add extreme-parameter regression tests and independent ODE verification.
+- Stabilize calculations at widely separated kinetic time scales.
 
 ## 0.2.0
-- Correct zero-order depletion, numerical searches, mass-balance verification, and packaging.
-- Add explicit first and bounded persistent stage-count criteria.
+- Correct depletion, bounded stage-count search and independent conservation tests.
 
 ## 0.1.0
-- Introduce single-reaction and consecutive-reaction finite-CSTR calculations.
+- Introduce PFR and CSTR calculations for simple and consecutive reaction networks.

@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite both the software and the associated research paper."
+message: "Please cite this software when using the reactor staging code; its reference article is listed below."
 title: "CSTR Convergence: Kinetic Criteria for Reactor Staging"
 authors:
   - family-names: Wang
     given-names: Wenjia
-version: 0.4.2.post1
+version: 0.5.0
 type: software
 license: MIT
 keywords:
