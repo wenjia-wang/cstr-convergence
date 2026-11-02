@@ -4,7 +4,7 @@ title: "CSTR Convergence: Kinetic Criteria for Reactor Staging"
 authors:
   - family-names: Wang
     given-names: Wenjia
-version: 0.4.2
+version: 0.4.2.post1
 type: software
 license: MIT
 keywords:

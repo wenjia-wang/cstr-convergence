@@ -7,7 +7,9 @@ from .core import (
     series_asymptotic_error, series_asymptotic_sign,
     power_law_asymptotic_coefficient, first_order_asymptotic_diagnostic,
 )
-__version__ = "0.4.2"
+__version__ = "0.4.2.post1"
 
 from .xylose import XyloseModel
 from .paper import optimized_series, optimized_phi_series, optimized_minimum_stages
+
+from .v14 import v14_benchmark, V14_CONCENTRATIONS

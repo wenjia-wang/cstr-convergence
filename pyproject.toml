@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cstr-convergence"
-version = "0.4.2"
+version = "0.4.2.post1"
 description = "Objective-specific kinetic criteria and decision-oriented finite-CSTR reactor staging"
 readme = "README.md"
 requires-python = ">=3.10"

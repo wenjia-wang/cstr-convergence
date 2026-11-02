@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.2a (package 0.4.2.post1; V14)
+- Preserve the verified v0.4.2 computations.
+- Add optimized V14 baseline table, explicit manuscript mapping, and automated numerical regression checks.
+
+
 ## 0.4.2
 - Add machine-readable software citation metadata with a ChemRxiv paper reference.
 - Add a deterministic kinetic-uncertainty and integer-stage-boundary demonstration.

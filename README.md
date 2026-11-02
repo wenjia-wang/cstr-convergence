@@ -1,6 +1,8 @@
 # CSTR Convergence
 
-**Decision-oriented kinetic criteria for finite reactor staging and process-design decisions.**
+**V14-aligned release: v0.4.2a** (Python package version `0.4.2.post1`). Reproduce the manuscript benchmarks with `python examples/v14_reproduction.py`. See [manuscript alignment](MANUSCRIPT_ALIGNMENT.md).
+
+**Objective-specific kinetic criteria for finite reactor staging and process-design decisions.**
 
 This Python package connects reaction-network kinetics to the number of equal-volume continuous stirred-tank reactors (CSTRs) needed to retain a specified fraction of plug-flow reactor (PFR) performance. It implements the finite-staging coefficient **Φ**, reproduces nonlinear xylose-dehydration results from a research manuscript, and illustrates when kinetic changes alter a discrete reactor-design choice.
 
@@ -60,6 +62,11 @@ python examples/stage_uncertainty.py
 ```
 
 ## Install and reproduce
+
+```bash
+python examples/v14_reproduction.py
+```
+
 
 ```bash
 python -m pip install -e ".[dev,plot]"
